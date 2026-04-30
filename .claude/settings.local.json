@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m venv .venv)",
+      "Bash(.venv/Scripts/python.exe --version)",
+      "Bash(.venv/Scripts/pip.exe --version)",
+      "Bash(.venv/Scripts/pip.exe install *)",
+      "Bash(.venv/Scripts/pip.exe freeze *)",
+      "Bash(npx tsc *)",
+      "Bash(.venv/Scripts/python.exe -c \"import main\")",
+      "Bash(.venv/Scripts/python.exe main.py)",
+      "Bash(.venv/Scripts/uvicorn.exe main:app --port 8000)",
+      "Bash(curl -s http://localhost:8000/health)",
+      "Bash(echo \"a,b,c\\\\n1,2,3\\\\n4,5,6\")",
+      "Bash(curl -s -X POST \"http://localhost:8000/datasets?name=test\" -F \"file=@/tmp/test.csv\")",
+      "Bash(printf \"a,b,c\\\\n1,2,3\\\\n4,5,6\\\\n\")",
+      "Bash(.venv/Scripts/python.exe -c ' *)",
+      "Bash(printf \"a,b,c\\\\r\\\\n1,2,3\\\\r\\\\n4,5,6\\\\r\\\\n\")",
+      "Bash(curl -s -X POST \"http://localhost:8000/datasets?name=test\" -F \"file=@C:/tmp/test.csv\")",
+      "Bash(curl -s -X POST \"http://localhost:8000/datasets?name=test\" -F \"file=@test_upload.csv;type=text/csv\" -v)",
+      "Bash(.venv/Scripts/uvicorn.exe main:app --port 8001)",
+      "Bash(curl -s -X POST \"http://localhost:8001/datasets?name=test\" -F \"file=@test_upload.csv;type=text/csv\")",
+      "Bash(curl -s http://localhost:8001/datasets?page=1)",
+      "Bash(curl -s -X DELETE \"http://localhost:8001/datasets/7cf2709e-6301-4fd6-a450-a6b47b05e952\")",
+      "Bash(.venv/Scripts/python.exe -m py_compile schemas/schemas.py routers/datasets.py routers/models.py routers/predictions.py routers/analytics.py services/storage.py services/ml_services.py main.py)",
+      "Bash(.venv/Scripts/python.exe -c \"from routers import datasets, models, predictions, analytics; print\\('imports OK'\\)\")",
+      "Bash(curl -s \"http://localhost:8000/datasets?page=1\")",
+      "Bash(netstat -ano)",
+      "Bash(taskkill /PID 9160 /F)",
+      "Bash(taskkill /PID 25972 /F)",
+      "Bash(taskkill /PID 3620 /F)",
+      "PowerShell(Stop-Process -Id 9160, 25972, 3620 -Force -ErrorAction SilentlyContinue)",
+      "Bash(.venv/Scripts/uvicorn.exe main:app --port 8000 --reload)"
+    ]
+  }
+}
