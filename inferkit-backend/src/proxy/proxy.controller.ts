@@ -33,32 +33,28 @@ export class ProxyController {
 
   // ─── All dataset routes ───────────────────────────────────────────────────
   @Throttle({ default: { limit: 60, ttl: 60_000 } })
-  @All('datasets')
-  @All('datasets/*path')
+  @All(['datasets', 'datasets/*path'])
   async proxyDatasets(@Req() req: Request, @Res() res: Response): Promise<void> {
     return this._proxy(req, res);
   }
 
   // ─── All model routes ─────────────────────────────────────────────────────
   @Throttle({ default: { limit: 30, ttl: 60_000 } })
-  @All('models')
-  @All('models/*path')
+  @All(['models', 'models/*path'])
   async proxyModels(@Req() req: Request, @Res() res: Response): Promise<void> {
     return this._proxy(req, res);
   }
 
   // ─── All prediction routes ────────────────────────────────────────────────
   @Throttle({ default: { limit: 100, ttl: 60_000 } })
-  @All('predictions')
-  @All('predictions/*path')
+  @All(['predictions', 'predictions/*path'])
   async proxyPredictions(@Req() req: Request, @Res() res: Response): Promise<void> {
     return this._proxy(req, res);
   }
 
   // ─── Analytics ────────────────────────────────────────────────────────────
   @Throttle({ default: { limit: 30, ttl: 60_000 } })
-  @All('analytics')
-  @All('analytics/*path')
+  @All(['analytics', 'analytics/*path'])
   async proxyAnalytics(@Req() req: Request, @Res() res: Response): Promise<void> {
     return this._proxy(req, res);
   }

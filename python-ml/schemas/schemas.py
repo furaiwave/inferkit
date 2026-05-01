@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Any, Literal
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
 
 
@@ -29,39 +29,46 @@ class DatasetListResponse(BaseModel):
 
 
 class RandomForestParams(BaseModel):
+    model_config = ConfigDict(extra='forbid')
     n_estimators: int = Field(100, ge=1)
     max_depth: int = Field(10, ge=1)
     min_samples_split: int = Field(2, ge=2)
 
 
 class GradientBoostingParams(BaseModel):
+    model_config = ConfigDict(extra='forbid')
     n_estimators: int = Field(100, ge=1)
     learning_rate: float = Field(0.1, gt=0, le=1)
     max_depth: int = Field(5, ge=1)
 
 
 class SVMParams(BaseModel):
+    model_config = ConfigDict(extra='forbid')
     C: float = Field(1.0, gt=0)
     kernel: Literal['rbf', 'linear', 'poly'] = 'rbf'
     gamma: Literal['scale', 'auto'] = 'scale'
 
 
 class LogisticParams(BaseModel):
+    model_config = ConfigDict(extra='forbid')
     C: float = Field(1.0, gt=0)
     max_iter: int = Field(100, ge=1)
     solver: Literal['lbfgs', 'liblinear'] = 'lbfgs'
 
 
 class LinearRegressionParams(BaseModel):
+    model_config = ConfigDict(extra='forbid')
     fit_intercept: bool = True
 
 
 class RidgeLassoParams(BaseModel):
+    model_config = ConfigDict(extra='forbid')
     alpha: float = Field(1.0, gt=0)
     fit_intercept: bool = True
 
 
 class XGBoostParams(BaseModel):
+    model_config = ConfigDict(extra='forbid')
     n_estimators: int = Field(100, ge=1)
     learning_rate: float = Field(0.1, gt=0, le=1)
     max_depth: int = Field(6, ge=1)
@@ -69,17 +76,20 @@ class XGBoostParams(BaseModel):
 
 
 class KMeansParams(BaseModel):
+    model_config = ConfigDict(extra='forbid')
     n_clusters: int = Field(3, ge=2)
     max_iter: int = Field(300, ge=1)
     init: Literal['k-means++', 'random'] = 'k-means++'
 
 
 class DBSCANParams(BaseModel):
+    model_config = ConfigDict(extra='forbid')
     eps: float = Field(0.5, gt=0)
     min_samples: int = Field(5, ge=1)
 
 
 class HierarchicalParams(BaseModel):
+    model_config = ConfigDict(extra='forbid')
     n_clusters: int = Field(3, ge=2)
     linkage: Literal['ward', 'complete', 'average'] = 'ward'
 

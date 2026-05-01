@@ -16,7 +16,7 @@ async def overview() -> AnalyticsOverview:
     recent: list[dict] = []
 
     for m in models:
-        kind = m.get('task', {}).get('kind', 'classification')
+        kind = (m.get('task') or {}).get('kind', 'classification')
         models_by_kind[kind] = models_by_kind.get(kind, 0) + 1
         if m.get('trained_at'):
             recent.append({'kind': 'model_trained', 'model_id': m['id'], 'name': m['name'], 'at': m['trained_at']})

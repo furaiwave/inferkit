@@ -1,5 +1,5 @@
 import { api } from '@/api/client';
-import { useQuery, useMutation } from '../hooks/useQuery';
+import { useQuery, useMutation } from './useQuery';
 import type {
   DatasetMeta, DatasetListResponse, ModelMeta, ModelDetail,
   CreateModelBody, PredictionRecord, PredictBody,

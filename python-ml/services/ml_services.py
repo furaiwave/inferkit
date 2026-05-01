@@ -145,7 +145,7 @@ def train_model(
             try:
                 roc = float(roc_auc_score(
                     y_te,
-                    y_prob if n_cls == 2 else y_prob,
+                    y_prob if n_cls > 2 else y_prob[:, 1],
                     multi_class='ovr' if n_cls > 2 else 'raise',
                     average='weighted' if n_cls > 2 else None,
                 ))

@@ -24,31 +24,49 @@ export function MetricsDashboard({ kind, metrics }: Props) {
     const m = metrics as ClassificationMetrics;
     return (
       <Card>
-        <CardHeader className="pb-2"><CardTitle>Evaluation Metrics</CardTitle></CardHeader>
+        <CardHeader className="pb-2"><CardTitle>Метрики якості</CardTitle></CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            <MetricCell label="Accuracy"  value={(m.accuracy  * 100).toFixed(2) + '%'} highlight />
-            <MetricCell label="Precision" value={(m.precision * 100).toFixed(2) + '%'} />
-            <MetricCell label="Recall"    value={(m.recall    * 100).toFixed(2) + '%'} />
-            <MetricCell label="F1 Score"  value={(m.f1        * 100).toFixed(2) + '%'} />
-            <MetricCell label="ROC AUC"   value={m.roc_auc.toFixed(4)} />
+            <MetricCell label="Точність"       value={(m.accuracy  * 100).toFixed(2) + '%'} highlight />
+            <MetricCell label="Прецизійність"  value={(m.precision * 100).toFixed(2) + '%'} />
+            <MetricCell label="Повнота"        value={(m.recall    * 100).toFixed(2) + '%'} />
+            <MetricCell label="F1-міра"        value={(m.f1        * 100).toFixed(2) + '%'} />
+            <MetricCell label="ROC AUC"        value={m.roc_auc.toFixed(4)} />
           </div>
           {m.confusion_matrix.length > 0 && (
             <div className="mt-4">
-              <p className="text-xs text-muted-foreground mb-2 font-medium">Confusion Matrix</p>
-              <div className="inline-grid gap-px" style={{ gridTemplateColumns: `repeat(${m.confusion_matrix[0].length}, minmax(0, 1fr))` }}>
-                {m.confusion_matrix.map((row, r) =>
-                  row.map((cell, c) => (
-                    <div
-                      key={`${r}-${c}`}
-                      className={`w-10 h-10 flex items-center justify-center text-xs font-mono font-semibold rounded-sm
-                        ${r === c ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'}`}
-                    >
-                      {cell}
+              <p className="text-xs text-muted-foreground font-medium mb-3">Правильні передбачення по класах</p>
+              {(() => {
+                const diagonal  = m.confusion_matrix.map((row, i) => row[i]);
+                const totals    = m.confusion_matrix.map(row => row.reduce((a, b) => a + b, 0));
+                const maxVal    = Math.max(...diagonal, 1);
+                return (
+                  <div className="overflow-x-auto pb-1">
+                    <div className="flex items-end gap-px min-w-max" style={{ height: '7rem' }}>
+                      {diagonal.map((val, i) => {
+                        const pct     = totals[i] > 0 ? Math.round(val / totals[i] * 100) : 0;
+                        const barH    = Math.max((val / maxVal) * 100, val > 0 ? 4 : 0);
+                        return (
+                          <div
+                            key={i}
+                            className="flex flex-col items-center justify-end gap-px group"
+                            style={{ width: '1.25rem' }}
+                            title={`Клас ${i}: ${val} з ${totals[i]} (${pct}%)`}
+                          >
+                            <div
+                              className="w-full rounded-t-sm transition-all bg-primary/60 group-hover:bg-primary"
+                              style={{ height: `${barH}%` }}
+                            />
+                            <span className="text-[9px] text-muted-foreground font-mono leading-none">
+                              {i}
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
-                  )),
-                )}
-              </div>
+                  </div>
+                );
+              })()}
             </div>
           )}
         </CardContent>
@@ -60,14 +78,14 @@ export function MetricsDashboard({ kind, metrics }: Props) {
     const m = metrics as RegressionMetrics;
     return (
       <Card>
-        <CardHeader className="pb-2"><CardTitle>Evaluation Metrics</CardTitle></CardHeader>
+        <CardHeader className="pb-2"><CardTitle>Метрики якості</CardTitle></CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             <MetricCell label="R²"   value={m.r2.toFixed(4)}   highlight />
             <MetricCell label="RMSE" value={m.rmse.toFixed(4)} />
             <MetricCell label="MAE"  value={m.mae.toFixed(4)}  />
             <MetricCell label="MSE"  value={m.mse.toFixed(4)}  />
-            <MetricCell label="MAPE" value={(m.mape * 100).toFixed(2) + '%'} />
+            <MetricCell label="MAPE" value={m.mape.toFixed(2) + '%'} />
           </div>
         </CardContent>
       </Card>
@@ -77,13 +95,13 @@ export function MetricsDashboard({ kind, metrics }: Props) {
   const m = metrics as ClusteringMetrics;
   return (
     <Card>
-      <CardHeader className="pb-2"><CardTitle>Evaluation Metrics</CardTitle></CardHeader>
+      <CardHeader className="pb-2"><CardTitle>Метрики якості</CardTitle></CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-          <MetricCell label="Silhouette Score"     value={m.silhouette_score.toFixed(4)}     highlight />
-          <MetricCell label="Davies-Bouldin Index" value={m.davies_bouldin_index.toFixed(4)} />
+          <MetricCell label="Силует"                value={m.silhouette_score.toFixed(4)}     highlight />
+          <MetricCell label="Індекс Девіса-Болдіна" value={m.davies_bouldin_index.toFixed(4)} />
           {m.inertia != null && (
-            <MetricCell label="Inertia" value={m.inertia.toFixed(2)} />
+            <MetricCell label="Інерція" value={m.inertia.toFixed(2)} />
           )}
         </div>
       </CardContent>

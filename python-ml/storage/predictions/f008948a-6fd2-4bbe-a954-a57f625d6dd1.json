@@ -1,0 +1,19 @@
+{
+  "id": "f008948a-6fd2-4bbe-a954-a57f625d6dd1",
+  "model_id": "0f56b8e9-990f-4922-9843-ca93c7f7241f",
+  "input": {
+    "Cabin": 2,
+    "Ticket": 1,
+    "Name": 124,
+    "Pclass": 4
+  },
+  "result": {
+    "kind": "regression",
+    "predicted_value": 0.40455972555993763,
+    "confidence_interval": [
+      0.36491287245506376,
+      0.4442065786648115
+    ]
+  },
+  "created_at": "2026-05-01T07:06:59.366211+00:00"
+}

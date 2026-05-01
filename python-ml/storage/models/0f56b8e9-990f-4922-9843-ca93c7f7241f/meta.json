@@ -1,0 +1,52 @@
+{
+  "id": "0f56b8e9-990f-4922-9843-ca93c7f7241f",
+  "dataset_id": "a54a90ae-af5b-4cbc-88e7-6079262310e9",
+  "name": "Test_Survived",
+  "task": {
+    "kind": "regression",
+    "algorithm": "xgboost",
+    "hyperparams": {
+      "n_estimators": 100,
+      "learning_rate": 0.1,
+      "max_depth": 6,
+      "subsample": 0.8
+    }
+  },
+  "target_column": "Survived",
+  "feature_columns": [
+    "Cabin",
+    "Ticket",
+    "Name",
+    "Pclass"
+  ],
+  "status": "trained",
+  "created_at": "2026-05-01T07:05:42.709442+00:00",
+  "trained_at": "2026-05-01T07:05:44.240099+00:00",
+  "duration_ms": 97,
+  "error": null,
+  "metrics": {
+    "mse": 0.22119544214199036,
+    "rmse": 0.470314195131287,
+    "mae": 0.3625302585790191,
+    "r2": 0.08786059695347326,
+    "mape": 1632489043.0163558
+  },
+  "feature_importance": [
+    {
+      "feature": "Ticket",
+      "importance": 0.403475080140862
+    },
+    {
+      "feature": "Name",
+      "importance": 0.39152882879986267
+    },
+    {
+      "feature": "Cabin",
+      "importance": 0.13769509701783472
+    },
+    {
+      "feature": "Pclass",
+      "importance": 0.06730099404144059
+    }
+  ]
+}

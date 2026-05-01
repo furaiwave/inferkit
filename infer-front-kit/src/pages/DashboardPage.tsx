@@ -2,7 +2,6 @@ import { type ElementType, Fragment } from 'react';
 import { Database, BrainCircuit, Zap, TrendingUp } from 'lucide-react';
 import { useAnalytics } from '@/hooks/useDomain';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -33,16 +32,23 @@ function StatCard({ label, value, icon: Icon, accent, iconColor }: StatCardProps
 }
 
 const KIND_CONFIG = [
-  { key: 'classification', label: 'Classification', bar: 'bg-primary',     dot: 'bg-primary' },
-  { key: 'regression',     label: 'Regression',     bar: 'bg-blue-500',    dot: 'bg-blue-500' },
-  { key: 'clustering',     label: 'Clustering',     bar: 'bg-orange-400',  dot: 'bg-orange-400' },
+  { key: 'classification', label: 'Класифікація', bar: 'bg-primary',     dot: 'bg-primary' },
+  { key: 'regression',     label: 'Регресія',     bar: 'bg-blue-500',    dot: 'bg-blue-500' },
+  { key: 'clustering',     label: 'Кластеризація', bar: 'bg-orange-400',  dot: 'bg-orange-400' },
 ];
 
 const ACTIVITY_BADGE: Record<string, string> = {
-  dataset_uploaded:  'bg-emerald-100 text-emerald-700',
-  model_created:     'bg-blue-100 text-blue-700',
-  model_trained:     'bg-primary/10 text-primary',
-  prediction_made:   'bg-amber-100 text-amber-700',
+  dataset_uploaded: 'bg-emerald-100 text-emerald-700',
+  model_created:    'bg-blue-100 text-blue-700',
+  model_trained:    'bg-primary/10 text-primary',
+  prediction_made:  'bg-amber-100 text-amber-700',
+};
+
+const ACTIVITY_LABEL: Record<string, string> = {
+  dataset_uploaded: 'датасет завантажено',
+  model_created:    'модель створено',
+  model_trained:    'модель навчено',
+  prediction_made:  'прогноз виконано',
 };
 
 export function DashboardPage() {
@@ -76,28 +82,28 @@ export function DashboardPage() {
     <div className="p-6 space-y-5">
       <div className="flex items-center gap-2 mb-1">
         <TrendingUp className="w-4 h-4 text-primary" />
-        <h2 className="text-base font-semibold">System Overview</h2>
+        <h2 className="text-base font-semibold">Загальна інформація</h2>
       </div>
 
       {/* Stat cards */}
       <div className="flex gap-3 flex-wrap">
         <StatCard
-          label="Datasets"    value={data.total_datasets}
+          label="Датасети"  value={data.total_datasets}
           icon={Database}     accent="bg-emerald-100" iconColor="text-emerald-600"
         />
         <StatCard
-          label="Models"      value={data.total_models}
+          label="Моделі"    value={data.total_models}
           icon={BrainCircuit} accent="bg-primary/10"  iconColor="text-primary"
         />
         <StatCard
-          label="Predictions" value={data.total_predictions}
+          label="Прогнози"  value={data.total_predictions}
           icon={Zap}          accent="bg-amber-100"   iconColor="text-amber-600"
         />
       </div>
 
       {/* Models by kind */}
       <Card>
-        <CardHeader className="pb-2"><CardTitle>Models by Type</CardTitle></CardHeader>
+        <CardHeader className="pb-2"><CardTitle>Моделі за типом</CardTitle></CardHeader>
         <CardContent className="space-y-4">
           {/* Stacked bar */}
           <div className="flex h-2.5 overflow-hidden rounded-full gap-px bg-muted">
@@ -128,10 +134,10 @@ export function DashboardPage() {
 
       {/* Recent activity */}
       <Card>
-        <CardHeader className="pb-2"><CardTitle>Recent Activity</CardTitle></CardHeader>
+        <CardHeader className="pb-2"><CardTitle>Остання активність</CardTitle></CardHeader>
         <CardContent className="p-0">
           {data.recent_activity.length === 0 ? (
-            <p className="text-sm text-muted-foreground px-4 py-6 text-center">No activity recorded yet.</p>
+            <p className="text-sm text-muted-foreground px-4 py-6 text-center">Активності ще немає.</p>
           ) : (
             <div>
               {data.recent_activity.slice(0, 10).map((event, i) => {
@@ -144,7 +150,7 @@ export function DashboardPage() {
                     <div className="flex items-center justify-between px-4 py-2.5">
                       <div className="flex items-center gap-3 min-w-0">
                         <span className={`inline-flex shrink-0 items-center rounded-sm px-1.5 py-0.5 text-xs font-medium ${badgeCls}`}>
-                          {kind.replace('_', ' ')}
+                          {ACTIVITY_LABEL[kind] ?? kind.replace('_', ' ')}
                         </span>
                         <span className="text-sm truncate text-foreground">{name || '—'}</span>
                       </div>

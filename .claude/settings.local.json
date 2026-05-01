@@ -30,7 +30,11 @@
       "Bash(taskkill /PID 25972 /F)",
       "Bash(taskkill /PID 3620 /F)",
       "PowerShell(Stop-Process -Id 9160, 25972, 3620 -Force -ErrorAction SilentlyContinue)",
-      "Bash(.venv/Scripts/uvicorn.exe main:app --port 8000 --reload)"
+      "Bash(.venv/Scripts/uvicorn.exe main:app --port 8000 --reload)",
+      "Bash(node -e \"const p=require\\('./node_modules/@nestjs/core/package.json'\\); console.log\\('nestjs core:', p.version\\)\")",
+      "Bash(node -e \"const p=require\\('./node_modules/express/package.json'\\); console.log\\('express:', p.version\\)\")",
+      "Bash(node -e \"const p=require\\('./node_modules/path-to-regexp/package.json'\\); console.log\\('path-to-regexp:', p.version\\)\")",
+      "Bash(node -e ' *)"
     ]
   }
 }

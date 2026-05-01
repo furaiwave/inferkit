@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { ElementType } from 'react';
 import { LayoutDashboard, Database, BrainCircuit } from 'lucide-react';
 import { DashboardPage } from './pages/DashboardPage';
 import { DatasetPage }   from './pages/DatasetPage';
@@ -7,10 +8,10 @@ import { cn } from '@/lib/utils';
 
 type Tab = 'dashboard' | 'datasets' | 'models';
 
-const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
-  { id: 'dashboard', label: 'Overview',  icon: LayoutDashboard },
-  { id: 'datasets',  label: 'Datasets',  icon: Database },
-  { id: 'models',    label: 'Models',    icon: BrainCircuit },
+const TABS: { id: Tab; label: string; icon: ElementType }[] = [
+  { id: 'dashboard', label: 'Огляд',     icon: LayoutDashboard },
+  { id: 'datasets',  label: 'Датасети',  icon: Database },
+  { id: 'models',    label: 'Моделі',    icon: BrainCircuit },
 ];
 
 export default function App() {
@@ -29,7 +30,7 @@ export default function App() {
             </div>
             <div>
               <span className="font-bold text-sm tracking-tight text-foreground">InferKit</span>
-              <span className="text-xs text-muted-foreground ml-1.5">ML Analytics</span>
+              <span className="text-xs text-muted-foreground ml-1.5">ML Аналітика</span>
             </div>
           </div>
 
@@ -59,7 +60,7 @@ export default function App() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
             </span>
-            <span className="text-xs text-muted-foreground">System Online</span>
+            <span className="text-xs text-muted-foreground">Система онлайн</span>
           </div>
         </div>
       </header>

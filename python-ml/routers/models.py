@@ -128,8 +128,9 @@ async def train_model(
     if meta.get('status') == 'training':
         raise HTTPException(status_code=409, detail='Model is already training')
 
-    background_tasks.add_task(_run_training, model_id)
     meta['status'] = 'training'
+    storage.save_model_meta(meta)
+    background_tasks.add_task(_run_training, model_id)
     return ModelMeta(**meta)
 
 

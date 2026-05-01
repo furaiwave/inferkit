@@ -22,6 +22,13 @@ import { cn } from '@/lib/utils';
 
 type BadgeVariant = React.ComponentProps<typeof Badge>['variant'];
 
+const STATUS_LABEL: Record<string, string> = {
+  idle:     'очікує',
+  training: 'навчання',
+  trained:  'навчено',
+  failed:   'помилка',
+};
+
 function statusVariant(s: string): BadgeVariant {
   switch (s) {
     case 'trained':  return 'default';
@@ -47,7 +54,7 @@ function PredictForm({ model, onResult }: { model: ModelDetail; onResult: (r: Pr
 
   return (
     <Card>
-      <CardHeader><CardTitle>Run Prediction</CardTitle></CardHeader>
+      <CardHeader><CardTitle>Запустити прогноз</CardTitle></CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
           {model.feature_columns.map((col) => (
@@ -63,7 +70,7 @@ function PredictForm({ model, onResult }: { model: ModelDetail; onResult: (r: Pr
           ))}
         </div>
         <Button onClick={handleSubmit} disabled={state.status === 'pending'} className="w-full">
-          {state.status === 'pending' ? 'Predicting…' : 'Run Prediction'}
+          {state.status === 'pending' ? 'Прогнозування…' : 'Запустити прогноз'}
         </Button>
         {state.status === 'error' && (
           <p className="text-xs text-destructive">{state.error.message}</p>
@@ -80,12 +87,13 @@ function ModelDetailPanel({ modelId, onDeleted }: { modelId: ModelId; onDeleted:
   const [prediction, setPrediction]          = useState<PredictionRecord | null>(null);
 
   const isTraining = query.status === 'success' && query.data.status === 'training';
+  const { refetch } = query;
 
   useEffect(() => {
     if (!isTraining) return;
-    const iv = setInterval(() => query.refetch(), 2000);
+    const iv = setInterval(refetch, 2000);
     return () => clearInterval(iv);
-  }, [isTraining, query]);
+  }, [isTraining, refetch]);
 
   if (query.status === 'loading' || query.status === 'idle') {
     return <div className="space-y-3"><Skeleton className="h-28" /><Skeleton className="h-40" /></div>;
@@ -98,13 +106,13 @@ function ModelDetailPanel({ modelId, onDeleted }: { modelId: ModelId; onDeleted:
   const canTrain  = model.status === 'idle' || model.status === 'failed';
 
   const handleDelete = async () => {
-    await deleteModel(model.id);
-    onDeleted();
+    const result = await deleteModel(model.id);
+    if (result) onDeleted();
   };
 
   const handleTrain = async () => {
-    await train(model.id);
-    query.refetch();
+    const result = await train(model.id);
+    if (result) query.refetch();
   };
 
   return (
@@ -119,7 +127,7 @@ function ModelDetailPanel({ modelId, onDeleted }: { modelId: ModelId; onDeleted:
           {canTrain && (
             <Button size="sm" variant="outline" onClick={handleTrain} disabled={trainState.status === 'pending'}>
               <Play className="w-3.5 h-3.5 mr-1.5" />
-              {trainState.status === 'pending' ? 'Starting…' : 'Train'}
+              {trainState.status === 'pending' ? 'Запуск…' : 'Навчити'}
             </Button>
           )}
           <Button size="icon" variant="ghost" className="text-muted-foreground hover:text-destructive" onClick={handleDelete}>
@@ -132,10 +140,10 @@ function ModelDetailPanel({ modelId, onDeleted }: { modelId: ModelId; onDeleted:
       <Card>
         <CardContent className="pt-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
-            ['Kind',      model.task.kind],
-            ['Algorithm', model.task.algorithm],
-            ['Status',    <Badge variant={statusVariant(model.status)}>{model.status}</Badge>],
-            ['Target',    model.target_column],
+            ['Тип',       model.task.kind],
+            ['Алгоритм',  model.task.algorithm],
+            ['Статус',    <Badge variant={statusVariant(model.status)}>{STATUS_LABEL[model.status] ?? model.status}</Badge>],
+            ['Ціль',      model.target_column],
           ].map(([label, value]) => (
             <div key={String(label)}>
               <p className="text-xs text-muted-foreground mb-1">{label}</p>
@@ -149,7 +157,7 @@ function ModelDetailPanel({ modelId, onDeleted }: { modelId: ModelId; onDeleted:
 
       {/* Training state messages */}
       {isTraining && (
-        <p className="text-sm text-muted-foreground animate-pulse">Training in progress — polling every 2s…</p>
+        <p className="text-sm text-muted-foreground animate-pulse">Навчання в процесі — оновлення кожні 2с…</p>
       )}
       {model.status === 'failed' && model.error && (
         <Card className="border-destructive/50">
@@ -163,11 +171,11 @@ function ModelDetailPanel({ modelId, onDeleted }: { modelId: ModelId; onDeleted:
       {model.status === 'trained' && (
         <Tabs defaultValue="metrics">
           <TabsList>
-            <TabsTrigger value="metrics">Metrics</TabsTrigger>
+            <TabsTrigger value="metrics">Метрики</TabsTrigger>
             <TabsTrigger value="features" disabled={!model.feature_importance?.length}>
-              Feature Importance
+              Важливість ознак
             </TabsTrigger>
-            <TabsTrigger value="predict">Predict</TabsTrigger>
+            <TabsTrigger value="predict">Прогноз</TabsTrigger>
           </TabsList>
 
           <TabsContent value="metrics">
@@ -205,24 +213,35 @@ export function ModelPage() {
   const models   = modelsQuery.status  === 'success'  ? modelsQuery.data        : [];
   const selected = datasets.find((d) => d.id === datasetId);
 
+  const { mutate: deleteModel } = useDeleteModel();
+  const { refetch: refetchModels } = modelsQuery;
+
   const handleCreate = useCallback(async (body: CreateModelBody) => {
     const result = await createModel(body);
-    if (result) { setModelId(result.id); modelsQuery.refetch(); }
-  }, [createModel, modelsQuery]);
+    if (result) { setModelId(result.id); refetchModels(); }
+  }, [createModel, refetchModels]);
+
+  const handleDeleteFromList = useCallback(async (id: ModelId) => {
+    const result = await deleteModel(id);
+    if (result) {
+      if (modelId === id) setModelId(null);
+      refetchModels();
+    }
+  }, [deleteModel, modelId, refetchModels]);
 
   return (
     <div className="p-6 flex gap-6 flex-wrap lg:flex-nowrap">
 
       <div className="w-full lg:w-72 shrink-0 space-y-4">
-        <h2 className="text-lg font-semibold">Models</h2>
+        <h2 className="text-lg font-semibold">Моделі</h2>
 
         <div className="space-y-1.5">
-          <Label>Dataset</Label>
+          <Label>Датасет</Label>
           <Select
             value={datasetId ?? ''}
             onValueChange={(v: string) => { setDatasetId(v as DatasetId); setModelId(null); }}
           >
-            <SelectTrigger><SelectValue placeholder="— select dataset —" /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder="— оберіть датасет —" /></SelectTrigger>
             <SelectContent>
               {datasets.map((d) => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
             </SelectContent>
@@ -233,24 +252,36 @@ export function ModelPage() {
           <CardContent className="p-0">
             {models.length === 0 ? (
               <p className="text-sm text-muted-foreground p-4">
-                {datasetId ? 'No models for this dataset.' : 'Select a dataset first.'}
+                {datasetId ? 'Для цього датасету немає моделей.' : 'Спочатку оберіть датасет.'}
               </p>
             ) : models.map((model, i) => (
               <React.Fragment key={model.id}>
-                <button
-                  type="button"
-                  onClick={() => setModelId(model.id)}
-                  className={cn(
-                    'w-full text-left px-4 py-3 transition-colors',
-                    modelId === model.id ? 'bg-muted' : 'hover:bg-muted/50',
-                  )}
-                >
-                  <div className="flex items-center justify-between gap-2 mb-0.5">
-                    <span className="text-sm font-medium truncate">{model.name}</span>
-                    <Badge variant={statusVariant(model.status)} className="shrink-0">{model.status}</Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground">{model.task.kind} · {model.task.algorithm}</p>
-                </button>
+                <div className={cn(
+                  'flex items-center group transition-colors',
+                  modelId === model.id ? 'bg-muted' : 'hover:bg-muted/50',
+                )}>
+                  <button
+                    type="button"
+                    onClick={() => setModelId(model.id)}
+                    className="flex-1 min-w-0 text-left px-4 py-3"
+                  >
+                    <div className="flex items-center justify-between gap-2 mb-0.5">
+                      <span className="text-sm font-medium truncate">{model.name}</span>
+                      <Badge variant={statusVariant(model.status)} className="shrink-0">
+                        {STATUS_LABEL[model.status] ?? model.status}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{model.task.kind} · {model.task.algorithm}</p>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteFromList(model.id)}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity pr-3 shrink-0 text-muted-foreground hover:text-destructive"
+                    title="Видалити модель"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
                 {i < models.length - 1 && <Separator />}
               </React.Fragment>
             ))}
@@ -267,7 +298,7 @@ export function ModelPage() {
         )}
       </div>
 
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 max-w-3xl">
         {modelId ? (
           <ModelDetailPanel
             modelId={modelId}
@@ -275,7 +306,7 @@ export function ModelPage() {
           />
         ) : (
           <div className="flex items-center justify-center h-64 text-muted-foreground text-sm">
-            Select a model to inspect
+            Оберіть модель для перегляду
           </div>
         )}
       </div>

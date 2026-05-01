@@ -65,25 +65,25 @@ export function DatasetUploader({ onUploaded, className }: DatasetUploaderProps)
                   </button>
                 </div>
               ) : (
-                <p className="text-sm font-medium mb-1">Upload a CSV dataset</p>
+                <p className="text-sm font-medium mb-1">Завантажте CSV датасет</p>
               )}
 
               {state.status === 'pending' ? (
                 <div className="space-y-1.5">
                   <Progress value={progress} className="h-1.5" />
-                  <p className="text-xs text-muted-foreground">Uploading… {progress}%</p>
+                  <p className="text-xs text-muted-foreground">Завантаження… {progress}%</p>
                 </div>
               ) : (
                 <div className="flex gap-2">
                   <label htmlFor="csv-upload" className="cursor-pointer">
                     <Button variant="outline" size="sm" asChild>
-                      <span>{file ? 'Change file' : 'Browse CSV'}</span>
+                      <span>{file ? 'Змінити файл' : 'Обрати CSV'}</span>
                     </Button>
                   </label>
                   <input id="csv-upload" type="file" accept=".csv" onChange={handleFile} className="sr-only" />
                   {file && (
                     <Button size="sm" onClick={handleUpload}>
-                      Upload
+                      Завантажити
                     </Button>
                   )}
                 </div>
@@ -101,10 +101,10 @@ export function DatasetUploader({ onUploaded, className }: DatasetUploaderProps)
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-foreground">{state.data.name}</p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                {state.data.row_count.toLocaleString()} rows · {state.data.columns.length} columns · uploaded successfully
+                {state.data.row_count.toLocaleString()} рядків · {state.data.columns.length} стовпців · успішно завантажено
               </p>
             </div>
-            <Button variant="ghost" size="sm" onClick={handleReset}>Upload another</Button>
+            <Button variant="ghost" size="sm" onClick={handleReset}>Завантажити ще</Button>
           </div>
         )}
 
@@ -115,10 +115,10 @@ export function DatasetUploader({ onUploaded, className }: DatasetUploaderProps)
               <AlertCircle className="w-6 h-6 text-destructive" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-destructive">Upload Failed</p>
+              <p className="text-sm font-medium text-destructive">Помилка завантаження</p>
               <p className="text-xs text-muted-foreground mt-0.5">{state.error.message}</p>
             </div>
-            <Button variant="outline" size="sm" onClick={handleReset}>Retry</Button>
+            <Button variant="outline" size="sm" onClick={handleReset}>Повторити</Button>
           </div>
         )}
 

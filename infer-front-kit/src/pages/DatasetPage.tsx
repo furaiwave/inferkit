@@ -17,6 +17,14 @@ const TYPE_STYLE: Record<string, string> = {
   text:        'bg-slate-100  text-slate-600',
 };
 
+const TYPE_LABEL: Record<string, string> = {
+  numeric:     'числові',
+  categorical: 'категоріальні',
+  datetime:    'дата/час',
+  boolean:     'логічні',
+  text:        'текстові',
+};
+
 function DatasetRow({ dataset, onDelete }: { dataset: DatasetMeta; onDelete: (id: DatasetId) => void }) {
   const colTypes = dataset.columns.reduce<Record<string, number>>((acc, c) => {
     acc[c.type] = (acc[c.type] ?? 0) + 1;
@@ -35,8 +43,8 @@ function DatasetRow({ dataset, onDelete }: { dataset: DatasetMeta; onDelete: (id
             <p className="text-xs text-muted-foreground mt-0.5">
               {new Date(dataset.created_at).toLocaleDateString()} ·{' '}
               {(dataset.size_bytes / 1024).toFixed(1)} KB ·{' '}
-              {dataset.row_count.toLocaleString()} rows ·{' '}
-              {dataset.columns.length} cols
+              {dataset.row_count.toLocaleString()} рядків ·{' '}
+              {dataset.columns.length} стовп.
             </p>
             {/* Column type breakdown */}
             {dataset.columns.length > 0 && (
@@ -46,7 +54,7 @@ function DatasetRow({ dataset, onDelete }: { dataset: DatasetMeta; onDelete: (id
                     key={type}
                     className={`inline-flex items-center rounded-sm px-1.5 py-0.5 text-xs font-medium ${TYPE_STYLE[type] ?? 'bg-muted text-muted-foreground'}`}
                   >
-                    {count} {type}
+                    {count} {TYPE_LABEL[type] ?? type}
                   </span>
                 ))}
               </div>
@@ -54,7 +62,7 @@ function DatasetRow({ dataset, onDelete }: { dataset: DatasetMeta; onDelete: (id
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <Badge variant="secondary" className="text-xs">ready</Badge>
+          <Badge variant="secondary" className="text-xs">готово</Badge>
           <Button
             variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive"
             onClick={() => onDelete(dataset.id)}
@@ -72,8 +80,8 @@ export function DatasetPage() {
   const { mutate: deleteDataset } = useDeleteDataset();
 
   const handleDelete = async (id: DatasetId) => {
-    await deleteDataset(id);
-    query.refetch();
+    const result = await deleteDataset(id);
+    if (result) query.refetch();
   };
 
   const datasets = query.status === 'success' ? query.data.data : [];
@@ -83,7 +91,7 @@ export function DatasetPage() {
 
       <div className="flex items-center gap-2 mb-1">
         <Table2 className="w-4 h-4 text-primary" />
-        <h2 className="text-base font-semibold">Datasets</h2>
+        <h2 className="text-base font-semibold">Датасети</h2>
       </div>
 
       <DatasetUploader onUploaded={() => query.refetch()} />
@@ -92,8 +100,8 @@ export function DatasetPage() {
         <CardHeader>
           <CardTitle>
             {query.status === 'success'
-              ? `${query.data.total} Dataset${query.data.total !== 1 ? 's' : ''}`
-              : 'Datasets'}
+              ? `${query.data.total} датасет${query.data.total === 1 ? '' : 'ів'}`
+              : 'Датасети'}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
@@ -104,7 +112,7 @@ export function DatasetPage() {
           )}
           {query.status === 'success' && datasets.length === 0 && (
             <p className="text-sm text-muted-foreground px-4 py-8 text-center">
-              No datasets uploaded yet. Upload a CSV file above to get started.
+              Датасети ще не завантажені. Завантажте CSV файл вище, щоб розпочати.
             </p>
           )}
           {datasets.map((ds, i) => (

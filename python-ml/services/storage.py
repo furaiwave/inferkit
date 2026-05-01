@@ -26,14 +26,24 @@ def load_dataset_meta(dataset_id: str) -> dict[str, Any] | None:
     p = DATASETS_DIR / dataset_id / 'meta.json'
     if not p.exists():
         return None
-    return json.loads(p.read_text())
+    try:
+        text = p.read_text().strip()
+        return json.loads(text) if text else None
+    except (json.JSONDecodeError, OSError):
+        return None
 
 def list_dataset_metas() -> list[dict[str, Any]]:
     result = []
     for p in sorted(DATASETS_DIR.iterdir()):
         meta_file = p / 'meta.json'
-        if meta_file.exists():
-            result.append(json.loads(meta_file.read_text()))
+        if not meta_file.exists():
+            continue
+        try:
+            text = meta_file.read_text().strip()
+            if text:
+                result.append(json.loads(text))
+        except (json.JSONDecodeError, OSError):
+            pass
     return result
 
 def save_dataset_csv(dataset_id: str, df: pd.DataFrame) -> None:
@@ -64,14 +74,24 @@ def load_model_meta(model_id: str) -> dict[str, Any] | None:
     p = MODELS_DIR / model_id / 'meta.json'
     if not p.exists():
         return None
-    return json.loads(p.read_text())
+    try:
+        text = p.read_text().strip()
+        return json.loads(text) if text else None
+    except (json.JSONDecodeError, OSError):
+        return None
 
 def list_model_metas() -> list[dict[str, Any]]:
     result = []
     for p in sorted(MODELS_DIR.iterdir()):
         meta_file = p / 'meta.json'
-        if meta_file.exists():
-            result.append(json.loads(meta_file.read_text()))
+        if not meta_file.exists():
+            continue
+        try:
+            text = meta_file.read_text().strip()
+            if text:
+                result.append(json.loads(text))
+        except (json.JSONDecodeError, OSError):
+            pass
     return result
 
 def save_estimator(model_id: str, estimator: Any, scaler: Any, encoder: Any | None = None) -> None:
@@ -111,12 +131,22 @@ def load_prediction(prediction_id: str) -> dict[str, Any] | None:
     p = PREDICTIONS_DIR / f"{prediction_id}.json"
     if not p.exists():
         return None
-    return json.loads(p.read_text())
+    try:
+        text = p.read_text().strip()
+        return json.loads(text) if text else None
+    except (json.JSONDecodeError, OSError):
+        return None
 
 def list_predictions(model_id: str | None = None) -> list[dict[str, Any]]:
     result = []
     for p in sorted(PREDICTIONS_DIR.glob('*.json')):
-        record = json.loads(p.read_text())
+        try:
+            text = p.read_text().strip()
+            if not text:
+                continue
+            record = json.loads(text)
+        except (json.JSONDecodeError, OSError):
+            continue
         if model_id is None or record.get('model_id') == model_id:
             result.append(record)
     return result

@@ -12,20 +12,19 @@ export function useQuery<T>(
   enabled = true,
 ): QueryState<T> & { refetch: () => void } {
   const [state, setState] = useState<QueryState<T>>({ status: 'idle' });
-  const abort  = useRef<AbortController | null>(null);
   const fnRef  = useRef(fetcher);
+  const runId  = useRef(0);
   fnRef.current = fetcher;
 
   const run = useCallback(async () => {
-    abort.current?.abort();
-    abort.current = new AbortController();
+    const id = ++runId.current;
     setState({ status: 'loading' });
     try {
       const data = await fnRef.current();
-      setState({ status: 'success', data });
+      if (runId.current === id) setState({ status: 'success', data });
     } catch (err) {
-      if ((err as Error).name === 'AbortError') return;
-      setState({ status: 'error', error: err instanceof Error ? err : new Error(String(err)) });
+      if (runId.current === id)
+        setState({ status: 'error', error: err instanceof Error ? err : new Error(String(err)) });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
@@ -33,7 +32,7 @@ export function useQuery<T>(
   useEffect(() => {
     if (!enabled) return;
     void run();
-    return () => abort.current?.abort();
+    return () => { runId.current++; };
   }, [run, enabled]);
 
   return { ...state, refetch: run };

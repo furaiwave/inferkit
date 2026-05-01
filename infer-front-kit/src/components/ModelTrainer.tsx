@@ -18,6 +18,12 @@ interface ModelTrainerProps {
 
 type TaskKind = 'classification' | 'regression' | 'clustering';
 
+const KIND_LABEL: Record<TaskKind, string> = {
+  classification: 'класифікація',
+  regression:     'регресія',
+  clustering:     'кластеризація',
+};
+
 const ALGORITHMS = {
   classification: ['random_forest', 'gradient_boosting', 'svm', 'logistic_regression'] satisfies ClassificationAlgorithm[],
   regression:     ['linear_regression', 'ridge', 'lasso', 'xgboost']                   satisfies RegressionAlgorithm[],
@@ -47,7 +53,7 @@ function HyperparamsEditor({
 }) {
   return (
     <div className="space-y-2">
-      <Label>Hyperparameters</Label>
+      <Label>Гіперпараметри</Label>
       <div className="rounded-md border p-3 space-y-2 bg-muted/30">
         {Object.entries(DEFAULT_HYPERPARAMS[algorithm]).map(([key, def]) => {
           const val = values[key] ?? def;
@@ -116,29 +122,29 @@ export function ModelTrainer({ datasetId, columns, onSubmit, isLoading, classNam
 
   return (
     <Card className={className}>
-      <CardHeader><CardTitle>New Model</CardTitle></CardHeader>
+      <CardHeader><CardTitle>Нова модель</CardTitle></CardHeader>
       <CardContent className="space-y-4">
 
         <div className="space-y-1.5">
-          <Label htmlFor="model-name">Model Name</Label>
-          <Input id="model-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. RandomForest v1" />
+          <Label htmlFor="model-name">Назва моделі</Label>
+          <Input id="model-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="напр. RandomForest v1" />
         </div>
 
         <Separator />
 
         <div className="space-y-1.5">
-          <Label>Task Kind</Label>
+          <Label>Тип задачі</Label>
           <div className="flex gap-2">
             {(['classification', 'regression', 'clustering'] satisfies TaskKind[]).map((k) => (
               <Button key={k} size="sm" variant={kind === k ? 'default' : 'outline'} onClick={() => handleKind(k)}>
-                {k}
+                {KIND_LABEL[k]}
               </Button>
             ))}
           </div>
         </div>
 
         <div className="space-y-1.5">
-          <Label>Algorithm</Label>
+          <Label>Алгоритм</Label>
           <Select value={algorithm} onValueChange={(v: string) => { setAlgorithm(v); setHyperparams({}); }}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
@@ -158,9 +164,9 @@ export function ModelTrainer({ datasetId, columns, onSubmit, isLoading, classNam
         <Separator />
 
         <div className="space-y-1.5">
-          <Label>Target Column</Label>
+          <Label>Цільова колонка</Label>
           <Select value={target} onValueChange={setTarget}>
-            <SelectTrigger><SelectValue placeholder="— select target —" /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder="— оберіть ціль —" /></SelectTrigger>
             <SelectContent>
               {columns.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
             </SelectContent>
@@ -168,7 +174,7 @@ export function ModelTrainer({ datasetId, columns, onSubmit, isLoading, classNam
         </div>
 
         <div className="space-y-1.5">
-          <Label>Feature Columns</Label>
+          <Label>Ознаки</Label>
           <div className="flex flex-wrap gap-1.5">
             {columns.filter((c) => c !== target).map((col) => (
               <Badge
@@ -190,7 +196,7 @@ export function ModelTrainer({ datasetId, columns, onSubmit, isLoading, classNam
           onClick={handleSubmit}
           disabled={!name || !target || features.size === 0 || isLoading}
         >
-          {isLoading ? 'Creating…' : 'Create Model'}
+          {isLoading ? 'Створення…' : 'Створити модель'}
         </Button>
       </CardFooter>
     </Card>

@@ -1,0 +1,16 @@
+{
+  "id": "9e2d5ea4-e7f4-484e-b021-b4591b0f5fff",
+  "model_id": "715fc4ee-e715-4974-b495-746cd325ef05",
+  "input": {
+    "Duration": 0
+  },
+  "result": {
+    "kind": "regression",
+    "predicted_value": 96.28637611577491,
+    "confidence_interval": [
+      86.85031125642897,
+      105.72244097512086
+    ]
+  },
+  "created_at": "2026-05-01T06:55:43.605296+00:00"
+}
